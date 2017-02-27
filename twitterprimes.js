@@ -39,11 +39,13 @@ function getLastPrime(){
   var lastPrime;
   try{
     lastPrime = parseInt($(".tweet-text").first().text().split(" ")[1]);
+    if(lastPrime == NaN){
+      while(!primes[0] && primes[0] != lastPrime){
+        nextPrime();
+      }
+    }
   }catch(e){
-    lastPrime = 0;
-  }
-  while(primes[0] != lastPrime){
-    nextPrime();
+    return goHome();
   }
   goHome();
 }
@@ -86,7 +88,7 @@ function tweetNextPrime(){
   if(running){
     setTimeout(function() {
       tweetNextPrime();
-    }, 1200);
+    }, 7500);
   }else{
     updateStatus("offline");
   }
