@@ -39,8 +39,9 @@ function getLastPrime(){
   var lastPrime;
   try{
     lastPrime = parseInt($(".tweet-text").first().text().split(" ")[1]);
-    if(lastPrime == NaN){
-      while(!primes[0] && primes[0] != lastPrime){
+    console.log(lastPrime, primes[0]);
+    if(lastPrime != NaN){
+      while(primes[0] != lastPrime){
         nextPrime();
       }
     }
@@ -83,6 +84,7 @@ function tweetNextPrime(){
   twitter.tweet("Prime: "+nextPrime());
   var oldText = $("#tweet-box-home-timeline").text()
   while(oldText != ""){
+    $(".tweeting-text").click();
     oldText = $("#tweet-box-home-timeline").waitTime(100, timeUnits.MILLISECONDS).text()
   }
   if(running){
