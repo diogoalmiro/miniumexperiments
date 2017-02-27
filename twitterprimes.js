@@ -1,12 +1,15 @@
+var timeUnits = require("minium/timeunits");
 var Twitter = require("twitter");
 var base = $(":root");
 var credentials = {
   email : "bottyminium",
   user : "bottyminium",
-  password : "__PASS_HERE__"
+  password : "qwertyuiop"
 };
-
+var twitter;
+var running = false;
 var primes = [];
+
 function nextPrime(){
   if(!primes[0]){
     primes = [2];
@@ -31,20 +34,64 @@ function isPrime(n){
   return true;
 }
 
-// get last prime written;
-base.browser().get("http://www.twitter.com/"+credentials.user);
-var lastPrime;
-try{
-  lastPrime = parseInt($(".tweet-text").first().text().split(" ")[1]);
-}catch(e){
-  lastPrime = 0;
-}
-while(primes[0] != lastPrime){
-  nextPrime();
+function getLastPrime(){
+  goToProfile();
+  var lastPrime;
+  try{
+    lastPrime = parseInt($(".tweet-text").first().text().split(" ")[1]);
+  }catch(e){
+    lastPrime = 0;
+  }
+  while(primes[0] != lastPrime){
+    nextPrime();
+  }
+  goHome();
 }
 
-var twitter = new Twitter(base, credentials);
+function updateStatus(status){
+  goToProfile();
+  $(".button-text").click();
+  $("#user_description").click();
+  $("#user_description").fill("status: "+status);
+  $(".ProfilePage-saveButton").click();
+  goHome();
+}
 
-setInterval(function(){
+function login(){
+  twitter = new Twitter(base, credentials);
+}
+
+function start(){
+  login();
+  updateStatus("online");
+  getLastPrime();
+  running = true;
+  tweetNextPrime()
+}
+
+function goToProfile(){
+  base.browser().get("http://www.twitter.com/"+credentials.user);
+}
+
+function goHome(){
+  base.browser().get("http://www.twitter.com/");
+}
+
+function tweetNextPrime(){
   twitter.tweet("Prime: "+nextPrime());
-},12000)
+  var oldText = $("#tweet-box-home-timeline").text()
+  while(oldText != ""){
+    oldText = $("#tweet-box-home-timeline").waitTime(100, timeUnits.MILLISECONDS).text()
+  }
+  if(running){
+    setTimeout(function() {
+      tweetNextPrime();
+    }, 1200);
+  }else{
+    updateStatus("offline");
+  }
+}
+
+function stop(){
+  running = false;
+}
